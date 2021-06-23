@@ -171,6 +171,7 @@
     }
   },
   "cli": {
+    "analytics": "e5656289-d767-4e58-9013-cfb80bdfb317",
     "defaultCollection": "@ionic/angular-toolkit"
   },
   "schematics": {
