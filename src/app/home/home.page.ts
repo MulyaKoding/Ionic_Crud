@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { AlertController } from '@ionic/angular';
+import { AlertController, ModalController } from '@ionic/angular';
 import { Student, StudentService } from '../services/student.service';
+import { StudentModalPage } from '../student-modal/student-modal.page';
 
 @Component({
   selector: 'app-home',
@@ -8,14 +9,50 @@ import { Student, StudentService } from '../services/student.service';
   styleUrls: ['home.page.scss'],
 })
 export class HomePage  implements OnInit{
+  
   students: Student[];
-  constructor(private  service: StudentService, 
-    private alertCtrl: AlertController
+  constructor(
+    private  service: StudentService, 
+    private alertCtrl: AlertController,
+    private modalCtrl: ModalController
     ) {}
 
   ngOnInit(){
     this.service.getAll().subscribe(response =>{
       this.students = response;
+    });
+  } 
+
+  addStudent(){
+    this.modalCtrl.create({
+      component: StudentModalPage
+    }).then(modal => {
+      modal.present();
+      return modal.onDidDismiss();
+  })
+    .then(({data, role}) => {
+      if (role === 'created') {
+        this.students.push(data);
+      }
+
+    });
+  } 
+
+  updateStudent(student: Student){
+    this.modalCtrl.create({
+      component: StudentModalPage, 
+      componentProps: {student} 
+
+    }).then(modal =>{
+      modal.present()
+      return modal.onDidDismiss();
+    }).then(({data, role}) =>{
+      this.students = this.students.filter(std => {
+        if(data.id === std.id) {
+          return data;
+        }
+        return std;
+      })
     });
   }
 
@@ -34,6 +71,6 @@ export class HomePage  implements OnInit{
       {text: 'No'}
       ]
     }).then(alertEl => alertEl.present())
-   
   }
-}
+  }
+  
